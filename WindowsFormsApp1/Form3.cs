@@ -8,6 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Soap;
+using System.Text.Json;
 
 namespace WindowsFormsApp1
 {
@@ -69,9 +73,9 @@ namespace WindowsFormsApp1
 
             try
             {
-                int id = Convert.ToInt32(Id.Text);
-                string name = Name.Text;
-                string location = Location.Text;
+                int id = Convert.ToInt32(txtid.Text);
+                string name = txtname.Text;
+                string location = txtlocation.Text;
                 fs = new FileStream(@"D:\TestFolder\File.txt", FileMode.Create, FileAccess.Write);
                 BinaryWriter bw = new BinaryWriter(fs);
                 bw.Write(id);
@@ -97,9 +101,9 @@ namespace WindowsFormsApp1
             {
                 fs = new FileStream(@"D:\TestFolder\File.txt", FileMode.Open, FileAccess.Read);
                 BinaryReader br = new BinaryReader(fs);
-                Id.Text = br.ReadInt32().ToString();
-                Name.Text = br.ReadString();
-                Location.Text = br.ReadString();
+                txtid.Text = br.ReadInt32().ToString();
+                txtname.Text = br.ReadString();
+                txtlocation.Text = br.ReadString();
                 br.Close();  // close the opeation reader
             }
             catch (Exception ex)
@@ -112,9 +116,240 @@ namespace WindowsFormsApp1
             }
         }
 
-        private void btnwrite_Click(object sender, EventArgs e)
+        private void btnwrite_Click_1(object sender, EventArgs e)
         {
 
+            try
+            {
+                int id = Convert.ToInt32(txtid.Text);
+                string name = txtname.Text;
+                string location = txtlocation.Text;
+                fs = new FileStream(@"D:\TestFolder\File.txt", FileMode.Create, FileAccess.Write);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(id);
+                bw.Write(name);
+                bw.Write(location);
+                bw.Close();
+                MessageBox.Show("Done");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+
+                fs.Close(); // free the resouce 
+            }
+
+        }
+
+        private void btnBinaryWrite_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                dept.Id = Convert.ToInt32(txtid.Text);
+                dept.Name = txtname.Text;
+                dept.Location = txtlocation.Text;
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\Dept", FileMode.Create, FileAccess.Write);
+                BinaryFormatter binary = new BinaryFormatter();
+                binary.Serialize(fs, dept);
+                MessageBox.Show("Done");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+
+        }
+
+        private void btnBinaryRead_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\Dept", FileMode.Open, FileAccess.Read);
+                BinaryFormatter binary = new BinaryFormatter();
+                dept = (Department)binary.Deserialize(fs);
+                txtid.Text = dept.Id.ToString();
+                txtname.Text = dept.Name;
+                txtlocation.Text = dept.Location;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        private void btnXmlWrite_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Department dept = new Department();
+                dept.Id = Convert.ToInt32(txtid.Text);
+                dept.Name = txtname.Text;
+                dept.Location = txtlocation.Text;
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\DeptXml", FileMode.Create, FileAccess.Write);
+                XmlSerializer xml = new XmlSerializer(typeof(Department));
+                xml.Serialize(fs, dept);
+                MessageBox.Show("Done");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+
+        }
+
+        private void btnXmlRead_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\DeptXml", FileMode.Open, FileAccess.Read);
+                XmlSerializer xml = new XmlSerializer(typeof(Department));
+                dept = (Department)xml.Deserialize(fs);
+                txtid.Text = dept.Id.ToString();
+                txtname.Text = dept.Name;
+                txtlocation.Text = dept.Location;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+
+        }
+
+        private void btnSoapWrite_Click(object sender, EventArgs e)
+        { 
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                dept.Id = Convert.ToInt32(txtid.Text);
+                dept.Name = txtname.Text;
+                dept.Location = txtlocation.Text;
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\DeptSoap", FileMode.Create, FileAccess.Write);
+                SoapFormatter soap = new SoapFormatter();
+                soap.Serialize(fs, dept);
+                MessageBox.Show("Done");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        private void btnSoapRead_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\DeptSoap", FileMode.Open, FileAccess.Read);
+                SoapFormatter soap = new SoapFormatter();
+                dept = (Department)soap.Deserialize(fs);
+                txtid.Text = dept.Id.ToString();
+                txtname.Text = dept.Name;
+                txtlocation.Text = dept.Location;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        private void btnJsonWrite_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                dept.Id = Convert.ToInt32(txtid.Text);
+                dept.Name = txtname.Text;
+                dept.Location = txtlocation.Text;
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\Deptjson", FileMode.Create, FileAccess.Write);
+                JsonSerializer.Serialize(fs, dept);
+                MessageBox.Show("Done");
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        private void btnJsonRead_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                // dept details accepting from the textboxes & storing in the object
+                Department dept = new Department();
+                // default file extension is .dat file (data file) / binary file
+                fs = new FileStream(@"D:\TestFolder\Deptjson", FileMode.Open, FileAccess.Read);
+                
+                dept = JsonSerializer.Deserialize<Department>(fs);
+                txtid.Text = dept.Id.ToString();
+                txtname.Text = dept.Name;
+                txtlocation.Text = dept.Location;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
         }
     }
 }
+
